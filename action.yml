@@ -1,0 +1,126 @@
+name: 'Heroku Deploy (Python)'
+description: 'Deploy to Heroku using a Python-based GitHub Action'
+branding:
+  icon: 'upload-cloud'
+  color: 'purple'
+
+inputs:
+  heroku_api_key:
+    description: 'Heroku API key used for authentication'
+    required: true
+    type: string
+
+  heroku_email:
+    description: 'Heroku account email'
+    required: true
+    type: string
+
+  heroku_app_name:
+    description: 'Name of the Heroku app to deploy to'
+    required: true
+    type: string
+
+  branch:
+    description: 'Branch to deploy from'
+    required: false
+    default: 'main'
+    type: string
+
+  appdir:
+    description: 'Subdirectory to deploy from'
+    required: false
+    default: ''
+    type: string
+
+  buildpack:
+    description: 'Heroku buildpack to use'
+    required: false
+    type: string
+
+  usedocker:
+    description: 'Deploy using Docker'
+    required: false
+    default: 'false'
+    type: boolean
+
+  docker_heroku_process_type:
+    description: 'Heroku process type for Docker deployment'
+    required: false
+    default: 'web'
+    type: string
+
+  docker_build_args:
+    description: 'Build arguments for Docker deployment'
+    required: false
+    type: string
+
+  healthcheck:
+    description: 'URL to perform health check after deployment'
+    required: false
+    type: string
+
+  checkstring:
+    description: 'String to check in health check response'
+    required: false
+    type: string
+
+  delay:
+    description: 'Delay before health check (in seconds)'
+    required: false
+    default: '0'
+    type: number
+
+  env_file:
+    description: 'Path to environment file for configuration'
+    required: false
+    type: string
+
+  dontuseforce:
+    description: 'Disable force push during deployment'
+    required: false
+    default: 'false'
+    type: boolean
+
+  dontautocreate:
+    description: 'Disable automatic app creation if not exists'
+    required: false
+    default: 'false'
+    type: boolean
+
+  rollbackonhealthcheckfailed:
+    description: 'Rollback deployment if health check fails'
+    required: false
+    default: 'false'
+    type: boolean
+
+  region:
+    description: 'Heroku app region'
+    required: false
+    type: string
+
+  stack:
+    description: 'Heroku app stack'
+    required: false
+    type: string
+
+  team:
+    description: 'Heroku team for app creation'
+    required: false
+    type: string
+
+outputs:
+  deployment_status:
+    description: 'Status of the Heroku deployment'
+    value: ${{ steps.deploy.outputs.status }}
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  # Optional: environment variables to pass to the container
+  env:
+    GITHUB_TOKEN: ${{ github.token }}
+
+# Specify which events can trigger this action
+on:
+  workflow_call:
+  workflow_dispatch:
