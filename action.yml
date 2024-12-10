@@ -116,9 +116,6 @@ outputs:
 runs:
   using: 'docker'
   image: 'Dockerfile'
-  # Optional: environment variables to pass to the container
-  env:
-    GITHUB_TOKEN: ${{ github.token }}
 
 # Specify which events can trigger this action
 on:
