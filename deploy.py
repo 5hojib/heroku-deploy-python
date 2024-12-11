@@ -105,7 +105,7 @@ def create_procfile(args):
 
 def deploy(args):
     """Deploy application to Heroku."""
-    force = "" if args.dontuseforce else "--force"
+    force = "--force"
 
     if args.usedocker:
         run_command(f"heroku stack:set container --app {args.app_name}")
@@ -130,14 +130,25 @@ def deploy(args):
         run_command(f"git push heroku {args.branch}:{remote_branch} {force}")
 
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ("yes", "true", "t", "y", "1"):
+        return True
+    elif v.lower() in ("no", "false", "f", "n", "0"):
+        return False
+    else:
+        raise argparse.ArgumentTypeError("Boolean value expected.")
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--email", type=str, required=True, help="Heroku account email")
     parser.add_argument("--api_key", type=str, required=True, help="Heroku API key")
     parser.add_argument("--app_name", type=str, required=True, help="Heroku app name")
     parser.add_argument("--branch", type=str, default="main", help="Git branch to deploy")
-    parser.add_argument("--dontuseforce", action="store_true", help="Avoid using force push")
-    parser.add_argument("--usedocker", action="store_true", help="Deploy using Docker")
+    # parser.add_argument("--dontuseforce", action="store_true", help="Avoid using force push")
+    parser.add_argument("--usedocker", type=str2bool, required=False, help="Deploy using Docker")
     parser.add_argument("--docker_process_type", type=str, default=None, help="Docker process type")
     parser.add_argument("--docker_build_args", type=str, default=None, help="Docker build arguments")
     # parser.add_argument("--env_file", type=str, default=None, help="Environment file path")
