@@ -2,7 +2,7 @@ import argparse
 import os
 import subprocess
 import sys
-import dotenv
+# import dotenv
 
 
 def run_command(command, cwd=None, check=True):
@@ -79,10 +79,10 @@ def add_config(args):
             config_vars.append(f"{key[3:]}='{value}'")
 
     # Add config vars from env_file if provided
-    if args.env_file:
-        env_path = os.path.join(args.appdir or "", args.env_file)
-        env_config = dotenv.dotenv_values(env_path)
-        config_vars.extend([f"{k}={v}" for k, v in env_config.items()])
+    # if args.env_file:
+    #     env_path = os.path.join(args.appdir or "", args.env_file)
+    #     env_config = dotenv.dotenv_values(env_path)
+    #     config_vars.extend([f"{k}={v}" for k, v in env_config.items()])
 
     if config_vars:
         subprocess.run(
@@ -140,7 +140,7 @@ def parse_args():
     parser.add_argument("--usedocker", action="store_true", help="Deploy using Docker")
     parser.add_argument("--docker_process_type", type=str, default=None, help="Docker process type")
     parser.add_argument("--docker_build_args", type=str, default=None, help="Docker build arguments")
-    parser.add_argument("--env_file", type=str, default=None, help="Environment file path")
+    # parser.add_argument("--env_file", type=str, default=None, help="Environment file path")
     parser.add_argument("--appdir", type=str, default=None, help="Application directory")
     parser.add_argument("--dontautocreate", action="store_true", help="Avoid auto-creating the app")
     parser.add_argument("--buildpack", type=str, default=None, help="Heroku buildpack")
