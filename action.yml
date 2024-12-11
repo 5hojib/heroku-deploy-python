@@ -1,123 +1,102 @@
-name: 'Heroku Deploy (Python)'
-description: 'Deploy to Heroku using a Python-based GitHub Action'
+name: 'Heroku Deploy Python'
+author: 'Mehedi Hasan Shojib'
+description: 'Deploy your application to Heroku using Python scripts.'
 branding:
   icon: 'upload-cloud'
-  color: 'purple'
+  color: 'green'
 
 inputs:
   heroku_api_key:
-    description: 'Heroku API key used for authentication'
+    description: >
+      Heroku API key used for authentication. 
+      Ensure this key has sufficient permissions to deploy your application.
     required: true
-    type: string
-
   heroku_email:
-    description: 'Heroku account email'
+    description: >
+      The email associated with your Heroku account.
     required: true
-    type: string
-
   heroku_app_name:
-    description: 'Name of the Heroku app to deploy to'
+    description: >
+      The name of your Heroku application.
     required: true
-    type: string
-
   branch:
-    description: 'Branch to deploy from'
+    description: >
+      The Git branch to deploy. Defaults to "main".
+    default: main
     required: false
-    default: 'main'
-    type: string
-
-  appdir:
-    description: 'Subdirectory to deploy from'
-    required: false
-    default: ''
-    type: string
-
-  buildpack:
-    description: 'Heroku buildpack to use'
-    required: false
-    type: string
-
   usedocker:
-    description: 'Deploy using Docker'
+    description: >
+      Set to "true" to deploy using Docker. Defaults to "false".
+    default: false
     required: false
-    default: 'false'
-    type: boolean
-
   docker_heroku_process_type:
-    description: 'Heroku process type for Docker deployment'
+    description: >
+      Specify the process type when using Docker (e.g., "web", "worker").
+      Required only if "usedocker" is true.
     required: false
-    default: 'web'
-    type: string
-
-  docker_build_args:
-    description: 'Build arguments for Docker deployment'
-    required: false
-    type: string
-
-  healthcheck:
-    description: 'URL to perform health check after deployment'
-    required: false
-    type: string
-
-  checkstring:
-    description: 'String to check in health check response'
-    required: false
-    type: string
-
-  delay:
-    description: 'Delay before health check (in seconds)'
-    required: false
-    default: '0'
-    type: number
-
-  env_file:
-    description: 'Path to environment file for configuration'
-    required: false
-    type: string
-
-  dontuseforce:
-    description: 'Disable force push during deployment'
-    required: false
-    default: 'false'
-    type: boolean
-
   dontautocreate:
-    description: 'Disable automatic app creation if not exists'
+    description: >
+      Set to "true" to skip auto-creation of the Heroku app.
+    default: false
     required: false
-    default: 'false'
-    type: boolean
-
-  rollbackonhealthcheckfailed:
-    description: 'Rollback deployment if health check fails'
-    required: false
-    default: 'false'
-    type: boolean
-
   region:
-    description: 'Heroku app region'
+    description: >
+      The Heroku region for app creation (e.g., "us", "eu"). Optional.
     required: false
-    type: string
-
-  stack:
-    description: 'Heroku app stack'
-    required: false
-    type: string
-
   team:
-    description: 'Heroku team for app creation'
+    description: >
+      The Heroku team for app creation. Optional.
     required: false
-    type: string
+  stack:
+    description: >
+      The Heroku stack to use for app creation (e.g., "container"). Optional.
+    required: false
+  delay:
+    description: >
+      Delay in seconds after deployment to ensure changes are applied.
+      Defaults to "0" (no delay).
+    default: 0
+    required: false
 
 outputs:
   deployment_status:
-    description: 'Status of the Heroku deployment'
-    value: ${{ steps.deploy.outputs.status }}
+    description: >
+      The result of the deployment process (e.g., "success", "failed").
+    value: ${{ steps.deploy-app.outputs.deployment_status }}
 
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-
-# Specify which events can trigger this action
-on:
-  workflow_call:
-  workflow_dispatch:
+  using: "composite"
+  steps:
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: pip install -r ${{ github.action_path }}/requirements.txt
+    
+    - name: Deploy to Heroku
+      id: deploy-app
+      run: |
+        args=( "--heroku_api_key" "${{ inputs.heroku_api_key }}" )
+        args+=( "--heroku_email" "${{ inputs.heroku_email }}" )
+        args+=( "--heroku_app_name" "${{ inputs.heroku_app_name }}" )
+        args+=( "--branch" "${{ inputs.branch }}" )
+        args+=( "--usedocker" "${{ inputs.usedocker }}" )
+        if [[ "${{ inputs.docker_heroku_process_type }}" != "" ]]; then
+          args+=( "--docker_heroku_process_type" "${{ inputs.docker_heroku_process_type }}" )
+        fi
+        args+=( "--dontautocreate" "${{ inputs.dontautocreate }}" )
+        if [[ "${{ inputs.region }}" != "" ]]; then
+          args+=( "--region" "${{ inputs.region }}" )
+        fi
+        if [[ "${{ inputs.team }}" != "" ]]; then
+          args+=( "--team" "${{ inputs.team }}" )
+        fi
+        if [[ "${{ inputs.stack }}" != "" ]]; then
+          args+=( "--stack" "${{ inputs.stack }}" )
+        fi
+        args+=( "--delay" "${{ inputs.delay }}" )
+        
+        echo "Running deploy.py with arguments: ${args[@]}"
+        python ${{ github.action_path }}/deploy.py "${args[@]}"
