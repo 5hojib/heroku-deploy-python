@@ -80,9 +80,9 @@ runs:
       id: deploy-app
       shell: bash
       run: |
-        args=( "--heroku_api_key" "${{ inputs.heroku_api_key }}" )
-        args+=( "--heroku_email" "${{ inputs.heroku_email }}" )
-        args+=( "--heroku_app_name" "${{ inputs.heroku_app_name }}" )
+        args=( "--api_key" "${{ inputs.heroku_api_key }}" )
+        args+=( "--email" "${{ inputs.heroku_email }}" )
+        args+=( "--app_name" "${{ inputs.heroku_app_name }}" )
         args+=( "--branch" "${{ inputs.branch }}" )
         args+=( "--usedocker" "${{ inputs.usedocker }}" )
         if [[ "${{ inputs.docker_heroku_process_type }}" != "" ]]; then
