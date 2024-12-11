@@ -72,10 +72,6 @@ runs:
       with:
         python-version: '3.13'
     
-    - name: Install dependencies
-      shell: bash
-      run: pip install -r ${{ github.action_path }}/requirements.txt
-    
     - name: Deploy to Heroku
       id: deploy-app
       shell: bash
@@ -98,7 +94,6 @@ runs:
         if [[ "${{ inputs.stack }}" != "" ]]; then
           args+=( "--stack" "${{ inputs.stack }}" )
         fi
-        args+=( "--delay" "${{ inputs.delay }}" )
         
         echo "Running deploy.py with arguments: ${args[@]}"
         python ${{ github.action_path }}/deploy.py "${args[@]}"
