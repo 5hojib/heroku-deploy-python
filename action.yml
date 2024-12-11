@@ -86,7 +86,7 @@ runs:
         args+=( "--branch" "${{ inputs.branch }}" )
         args+=( "--usedocker" "${{ inputs.usedocker }}" )
         if [[ "${{ inputs.docker_heroku_process_type }}" != "" ]]; then
-          args+=( "--docker_heroku_process_type" "${{ inputs.docker_heroku_process_type }}" )
+          args+=( "--docker_process_type" "${{ inputs.docker_heroku_process_type }}" )
         fi
         args+=( "--dontautocreate" "${{ inputs.dontautocreate }}" )
         if [[ "${{ inputs.region }}" != "" ]]; then
